@@ -1,7 +1,10 @@
 package main
 
 import (
+	"net/http"
+
 	"example.com/go-zius/configs"
+	"example.com/go-zius/responses"
 	"example.com/go-zius/routes"
 	"github.com/gin-gonic/gin"
 )
@@ -18,5 +21,11 @@ func main() {
 
 	// Run at specific port
 	port := configs.GetENV("APP_PORT")
+
+	// Handle not found routes
+	router.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, responses.ErrorResponse{Status: http.StatusNotFound, Message: "Not found !"})
+
+	})
 	router.Run(":" + port)
 }

@@ -6,5 +6,6 @@ import (
 )
 
 func WishlistRoute(router *gin.Engine) {
-	router.POST("/wishlists", controllers.CreateWishlist())
+	wishlist := router.Group("/v1/wishlists")
+	wishlist.POST("/", controllers.CreateWishlist())
 }
