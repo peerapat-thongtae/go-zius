@@ -45,6 +45,29 @@ func (e *WishlistService) CreateWishlist(ctx context.Context, wishlist models.Cr
 	return newWishlist, err
 }
 
+func (e *WishlistService) UpdateWishlist(ctx context.Context, id string, wishlist models.UpdateWishlistRequest) (models.Wishlist, error) {
+	// findWishlist, _ := e.GetWishlistByName(ctx, wishlist.Name)
+	// if findWishlist != nil {
+	// 	return *findWishlist, customerrors.ErrWishlistDuplicate
+	// }
+
+	// updaterReq := models.Wishlist{
+	// 	Name:   wishlist.Name,
+	// 	Detail: wishlist.Detail,
+	// 	Price:  wishlist.Price,
+	// 	Type:   wishlist.Type,
+	// }
+
+	// updateQ := make(bson.M)
+	// updateQ["$set"] = wishlist
+
+	idPrimitive, _ := primitive.ObjectIDFromHex(id)
+	updater := bson.D{primitive.E{Key: "$set", Value: bson.D{primitive.E{Key: "name", Value: wishlist.Name}, primitive.E{Key: "detail", Value: wishlist.Detail}, primitive.E{Key: "type", Value: wishlist.Type}, primitive.E{Key: "price", Value: wishlist.Price}}}}
+	res, err := wishlistCollection.UpdateByID(ctx, bson.D{{Key: "_id", Value: idPrimitive}}, updater)
+	println(res.UpsertedCount)
+	return models.Wishlist{}, err
+}
+
 func (e *WishlistService) GetAllWishlists(ctx context.Context) ([]*models.Wishlist, error) {
 	// opts := options.Find().SetSort(bson.D{{"name", 1}})
 	var wishlists []*models.Wishlist
@@ -73,8 +96,8 @@ func (e *WishlistService) GetAllWishlists(ctx context.Context) ([]*models.Wishli
 	return wishlists, nil
 }
 
-func (e *WishlistService) DeleteWishlist(ctx context.Context, id *string) error {
-	idPrimitive, _ := primitive.ObjectIDFromHex(*id)
+func (e *WishlistService) DeleteWishlist(ctx context.Context, id string) error {
+	idPrimitive, _ := primitive.ObjectIDFromHex(id)
 	res, _ := wishlistCollection.DeleteOne(ctx, bson.D{{Key: "_id", Value: &idPrimitive}})
 
 	if res.DeletedCount == 0 {

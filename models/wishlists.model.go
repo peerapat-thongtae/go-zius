@@ -18,3 +18,10 @@ type CreateWishlistRequest struct {
 	Price  int    `json:"price" bson:"price" validate:"numeric,min=1"`
 	Type   string `json:"type" bson:"type" validate:"required"`
 }
+
+type UpdateWishlistRequest struct {
+	Name   string `json:"name" bson:"name" validate:""`
+	Detail string `json:"detail" bson:"detail" validate:"omitempty"`
+	Price  int    `json:"price" bson:"price" validate:"omitempty,min=1"`
+	Type   string `json:"type" bson:"type" validate:""`
+}

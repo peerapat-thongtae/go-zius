@@ -53,6 +53,42 @@ func CreateWishlist() gin.HandlerFunc {
 	}
 }
 
+func UpdateWishlist() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var wishlist models.UpdateWishlistRequest
+		defer cancel()
+
+		//validate the request body
+		if err := c.BindJSON(&wishlist); err != nil {
+			c.JSON(http.StatusBadRequest, responses.ErrorResponse{Status: http.StatusBadRequest, Message: err.Error()})
+			return
+		}
+
+		id := c.Param("id")
+		//use the validator library to validate required fields
+		if validationErr := validate.Struct(&wishlist); validationErr != nil {
+			c.JSON(http.StatusBadRequest, responses.ErrorResponse{Status: http.StatusBadRequest, Message: validationErr.Error()})
+			return
+		}
+
+		service := services.NewWishlistService(ctx)
+
+		newWishlist, err := service.UpdateWishlist(ctx, id, wishlist)
+
+		if err != nil {
+			if err == customerrors.ErrWishlistDuplicate {
+				c.JSON(http.StatusConflict, responses.ErrorResponse{Status: http.StatusConflict, Message: err.Error()})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, responses.ErrorResponse{Status: http.StatusInternalServerError, Message: err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, responses.CreatedWishlistResponse{Status: http.StatusCreated, Message: "success", Data: newWishlist})
+	}
+}
+
 func GetAllWishlists() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -78,7 +114,7 @@ func DeleteWishlist() gin.HandlerFunc {
 		defer cancel()
 		service := services.NewWishlistService(ctx)
 
-		err := service.DeleteWishlist(ctx, &id)
+		err := service.DeleteWishlist(ctx, id)
 
 		if err != nil {
 			if err == customerrors.ErrDeleteWishlist {
