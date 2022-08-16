@@ -21,19 +21,18 @@ var validate = validator.New()
 func CreateWishlist() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var wishlist models.Wishlist
+		var wishlist models.CreateWishlistRequest
 		defer cancel()
 
 		//validate the request body
 		if err := c.BindJSON(&wishlist); err != nil {
-			c.JSON(http.StatusBadRequest, responses.ErrorResponse{Status: http.StatusBadRequest, Message: "error"})
+			c.JSON(http.StatusBadRequest, responses.ErrorResponse{Status: http.StatusBadRequest, Message: err.Error()})
 			return
 		}
 
 		//use the validator library to validate required fields
 		if validationErr := validate.Struct(&wishlist); validationErr != nil {
-
-			c.JSON(http.StatusBadRequest, responses.ErrorResponse{Status: http.StatusBadRequest, Message: "validation errors"})
+			c.JSON(http.StatusBadRequest, responses.ErrorResponse{Status: http.StatusBadRequest, Message: validationErr.Error()})
 			return
 		}
 

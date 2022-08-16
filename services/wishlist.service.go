@@ -27,7 +27,7 @@ func NewWishlistService(ctx context.Context) WishlistService {
 	}
 }
 
-func (e *WishlistService) CreateWishlist(ctx context.Context, wishlist models.Wishlist) (models.Wishlist, error) {
+func (e *WishlistService) CreateWishlist(ctx context.Context, wishlist models.CreateWishlistRequest) (models.Wishlist, error) {
 	findWishlist, _ := e.GetWishlistByName(ctx, wishlist.Name)
 	if findWishlist != nil {
 		return *findWishlist, customerrors.ErrWishlistDuplicate

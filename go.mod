@@ -8,6 +8,7 @@ require (
 	github.com/codegangsta/gin v0.0.0-20211113050330-71f90109db02 // indirect
 	github.com/gin-gonic/gin v1.8.1 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/go-playground/validator/v10 v10.11.0 // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/mattn/go-shellwords v1.0.12 // indirect
