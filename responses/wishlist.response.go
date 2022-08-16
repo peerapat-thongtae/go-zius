@@ -7,3 +7,9 @@ type CreatedWishlistResponse struct {
 	Message string          `json:"message"`
 	Data    models.Wishlist `json:"data"`
 }
+
+type GetWishlistsResponse struct {
+	Status  int                `json:"status"`
+	Message string             `json:"message"`
+	Data    []*models.Wishlist `json:"data"`
+}

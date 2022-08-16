@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"example.com/go-zius/configs"
@@ -42,6 +43,45 @@ func (e *WishlistService) CreateWishlist(ctx context.Context, wishlist models.Wi
 
 	_, err := wishlistCollection.InsertOne(ctx, newWishlist)
 	return newWishlist, err
+}
+
+func (e *WishlistService) GetAllWishlists(ctx context.Context) ([]*models.Wishlist, error) {
+	// opts := options.Find().SetSort(bson.D{{"name", 1}})
+	var wishlists []*models.Wishlist
+	cursor, err := wishlistCollection.Find(ctx, bson.D{{}})
+	if err != nil {
+		return nil, err
+	}
+	for cursor.Next(ctx) {
+		var wishlist models.Wishlist
+		err := cursor.Decode(&wishlist)
+		if err != nil {
+			return nil, err
+		}
+		wishlists = append(wishlists, &wishlist)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	cursor.Close(ctx)
+
+	if len(wishlists) == 0 {
+		return nil, errors.New("documents not found")
+	}
+	return wishlists, nil
+}
+
+func (e *WishlistService) DeleteWishlist(ctx context.Context, id *string) error {
+	idPrimitive, _ := primitive.ObjectIDFromHex(*id)
+	res, _ := wishlistCollection.DeleteOne(ctx, bson.D{{Key: "_id", Value: &idPrimitive}})
+
+	if res.DeletedCount == 0 {
+		// the collection.
+		return customerrors.ErrDeleteWishlist
+	}
+	return nil
 }
 
 func (e *WishlistService) GetWishlistByName(ctx context.Context, name string) (*models.Wishlist, error) {

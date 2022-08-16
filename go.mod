@@ -13,4 +13,5 @@ require (
 	github.com/mattn/go-shellwords v1.0.12 // indirect
 	github.com/urfave/cli v1.22.9 // indirect
 	go.mongodb.org/mongo-driver v1.10.1 // indirect
+	gopkg.in/validator.v2 v2.0.1 // indirect
 )

@@ -53,3 +53,43 @@ func CreateWishlist() gin.HandlerFunc {
 		c.JSON(http.StatusCreated, responses.CreatedWishlistResponse{Status: http.StatusCreated, Message: "success", Data: newWishlist})
 	}
 }
+
+func GetAllWishlists() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		service := services.NewWishlistService(ctx)
+
+		wishlists, err := service.GetAllWishlists(ctx)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, responses.ErrorResponse{Status: http.StatusInternalServerError, Message: err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusCreated, responses.GetWishlistsResponse{Status: http.StatusCreated, Message: "success", Data: wishlists})
+	}
+}
+
+func DeleteWishlist() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+		id := c.Param("id")
+		defer cancel()
+		service := services.NewWishlistService(ctx)
+
+		err := service.DeleteWishlist(ctx, &id)
+
+		if err != nil {
+			if err == customerrors.ErrDeleteWishlist {
+				c.JSON(http.StatusNotFound, responses.ErrorResponse{Status: http.StatusNotFound, Message: err.Error()})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, responses.ErrorResponse{Status: http.StatusInternalServerError, Message: err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, responses.GetWishlistsResponse{Status: http.StatusOK, Message: "Deleted"})
+	}
+}
